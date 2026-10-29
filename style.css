@@ -1,0 +1,1236 @@
+/* style.css — PARKLITE Modern Understated Interface & Responsive Desktop/Mobile HUD */
+
+:root {
+  --bg-panel: rgba(13, 19, 31, 0.90);
+  --bg-panel-solid: #0f172a;
+  --bg-card: #162033;
+  --border-subtle: rgba(148, 163, 184, 0.22);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #38bdf8;
+  --accent-strong: #0284c7;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --danger: #ef4444;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 7px;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0b1120;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+#canvas-container {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#canvas-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.collision-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 0 rgba(239, 68, 68, 0);
+  transition: box-shadow 0.14s ease-out;
+}
+
+.collision-flash.active {
+  box-shadow: inset 0 0 0 7px rgba(239, 68, 68, 0.72), inset 0 0 36px rgba(239, 68, 68, 0.35);
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* --- OVERLAY SCREENS & MODALS --- */
+.overlay-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(8, 13, 23, 0.62);
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+.overlay-screen.active {
+  display: flex;
+}
+
+#modal-missions,
+#modal-settings,
+#modal-about {
+  z-index: 25;
+}
+
+.menu-card,
+.modal-card {
+  width: 100%;
+  max-width: 430px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 26px 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.48);
+}
+
+.modal-wide {
+  max-width: 760px;
+}
+
+.modal-narrow {
+  max-width: 390px;
+  text-align: center;
+}
+
+.modal-card {
+  max-height: 92vh;
+  overflow-y: auto;
+}
+
+.brand-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.brand-title span {
+  color: var(--accent);
+}
+
+.brand-subtitle {
+  margin: 8px 0 22px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-quick-tip {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.menu-quick-tip span {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #e2e8f0;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 4px;
+}
+
+/* --- BUTTONS --- */
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 11px 18px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+  color: var(--text-main);
+}
+
+.btn:active {
+  transform: scale(0.985);
+}
+
+.btn-lg {
+  padding: 13px 20px;
+  font-size: 16px;
+}
+
+.btn-primary {
+  background: var(--accent-strong);
+  border-color: rgba(56, 189, 248, 0.45);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: #0369a1;
+}
+
+.btn-secondary {
+  background: #1e293b;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+.btn-secondary:hover {
+  background: #283548;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.18);
+  color: var(--text-muted);
+}
+
+.btn-ghost:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* --- MODAL HEADERS & GRIDS --- */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.modal-header h2,
+.modal-narrow h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.modal-narrow h2 {
+  margin-bottom: 16px;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 6px;
+}
+
+.btn-close:hover {
+  color: var(--text-main);
+}
+
+.modal-lead {
+  margin: 0 0 16px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.modal-footer {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.missions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 12px;
+}
+
+.mission-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+
+.mission-card:hover {
+  border-color: var(--accent);
+  background: #1c2942;
+}
+
+.mission-card.selected {
+  border-color: var(--accent);
+}
+
+.mc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.mc-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mc-stars {
+  font-size: 13px;
+  color: var(--amber);
+  letter-spacing: 1px;
+}
+
+.mc-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.mc-desc {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.mc-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  padding-top: 8px;
+}
+
+.mc-play-cta {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* --- SETTINGS & ABOUT --- */
+.settings-layout {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 22px;
+  margin-top: 8px;
+}
+
+.setting-group {
+  margin-bottom: 15px;
+}
+
+.setting-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.setting-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 6px;
+}
+
+.setting-label-row .setting-label {
+  margin-bottom: 0;
+}
+
+.setting-val {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--accent);
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.segmented-control {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.seg-btn {
+  padding: 8px 10px;
+  background: #0f172a;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.seg-btn.active {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.instructions-col {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.instructions-col h3,
+.about-body h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.controls-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12.5px;
+}
+
+.controls-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+  gap: 8px;
+}
+
+.controls-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.about-body p,
+.about-body li {
+  font-size: 13.5px;
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.about-body ul {
+  padding-left: 18px;
+  margin: 8px 0 0;
+}
+
+.about-body li {
+  margin-bottom: 6px;
+}
+
+/* --- RESULT SCREEN --- */
+.result-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  margin-bottom: 8px;
+}
+
+.result-badge.failed {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+}
+
+.result-stars {
+  font-size: 30px;
+  color: var(--amber);
+  letter-spacing: 4px;
+  margin: -6px 0 14px;
+}
+
+.score-breakdown {
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 5px 0;
+}
+
+.score-row strong {
+  color: var(--text-main);
+  font-family: var(--font-mono);
+}
+
+.score-row.score-total {
+  margin-top: 6px;
+  padding-top: 9px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+.score-row.score-total strong {
+  color: var(--emerald);
+  font-size: 17px;
+}
+
+.result-fail-msg {
+  color: #fca5a5;
+  font-size: 14px;
+  margin: 0 0 18px;
+}
+
+/* --- IN-GAME HUD --- */
+.hud {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+           max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+
+.hud-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mission-panel {
+  pointer-events: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  max-width: 520px;
+}
+
+.mission-header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mission-tag {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  background: rgba(56, 189, 248, 0.14);
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.mission-title {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.mission-stats {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.stat-pill {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: #cbd5e1;
+  background: rgba(30, 41, 59, 0.85);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.mission-desc {
+  margin: 5px 0 8px;
+  font-size: 12.5px;
+  color: #cbd5e1;
+  line-height: 1.35;
+}
+
+.parking-check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.check-badges {
+  display: flex;
+  gap: 4px;
+}
+
+.check-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #1e293b;
+  color: #64748b;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.check-badge.ok {
+  background: rgba(16, 185, 129, 0.22);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.progress-track {
+  width: 78px;
+  height: 7px;
+  background: #1e293b;
+  border-radius: 99px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--emerald);
+  transition: width 0.06s linear;
+}
+
+.park-hint {
+  font-size: 11.5px;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Top-Right Utility Bar */
+.utility-bar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.hud-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 8px 11px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.hud-btn:hover {
+  border-color: var(--accent);
+}
+
+.hud-btn-icon {
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 8px 12px;
+}
+
+/* Toast message for gear/clutch hints */
+.hud-toast {
+  align-self: center;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid var(--amber);
+  color: #fde68a;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* --- BOTTOM HUD: STEERING WHEEL, TELEMETRY, PEDALS --- */
+.hud-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Steering Wheel Widget */
+.wheel-zone {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.steering-wheel-pad {
+  width: 136px;
+  height: 136px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(15, 23, 42, 0.55) 45%, rgba(15, 23, 42, 0.15) 72%);
+  cursor: grab;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.steering-wheel-pad.dragging {
+  cursor: grabbing;
+}
+
+.steering-wheel-svg {
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.wheel-caption {
+  font-size: 11px;
+  color: rgba(226, 232, 240, 0.78);
+  background: rgba(13, 19, 31, 0.72);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* Telemetry & Gear Selector */
+.telemetry-cluster {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.telemetry-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+}
+
+.speed-box {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 78px;
+  justify-content: flex-end;
+}
+
+.speed-val {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.speed-unit {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.gear-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: #1e293b;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.gear-box.gear-reverse {
+  border-color: var(--amber);
+}
+
+.gear-box.gear-park {
+  border-color: #64748b;
+}
+
+.gear-caption {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.gear-val {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--emerald);
+}
+
+.gear-box.gear-reverse .gear-val {
+  color: var(--amber);
+}
+
+.gear-box.gear-park .gear-val {
+  color: #cbd5e1;
+}
+
+.gauges-box {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 158px;
+}
+
+.gauge-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gauge-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 44px;
+}
+
+.gauge-bar {
+  flex: 1;
+  height: 7px;
+  background: #1e293b;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  width: 0%;
+}
+
+.rpm-fill {
+  background: linear-gradient(90deg, #38bdf8 0%, #10b981 72%, #ef4444 95%);
+}
+
+.clutch-fill {
+  background: #a855f7;
+}
+
+.gauge-num {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: #cbd5e1;
+  width: 34px;
+  text-align: right;
+}
+
+.stall-banner {
+  background: rgba(185, 28, 28, 0.92);
+  border: 1px solid #fca5a5;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.gear-strip {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.gear-btn {
+  min-width: 34px;
+  height: 32px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: #1e293b;
+  color: #cbd5e1;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.gear-btn:hover {
+  background: #2b3950;
+}
+
+.gear-btn.active {
+  background: var(--accent-strong);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+/* Pedals Cluster (Right side) */
+.pedals-cluster {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.pedals-cluster.compact-desktop {
+  transform: scale(0.88);
+  transform-origin: bottom right;
+}
+
+.handbrake-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.handbrake-btn.active {
+  background: rgba(239, 68, 68, 0.28);
+  border-color: var(--danger);
+  color: #fecaca;
+}
+
+.pedals-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.pedal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 56px;
+  height: 84px;
+  padding: 9px 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  background: linear-gradient(180deg, #273449 0%, #151e2e 100%);
+  color: #e2e8f0;
+  cursor: pointer;
+  touch-action: none;
+  transition: transform 0.06s ease, border-color 0.08s ease;
+}
+
+.pedal-gas {
+  height: 98px;
+  border-color: rgba(16, 185, 129, 0.42);
+}
+
+.pedal-brake {
+  height: 82px;
+  border-color: rgba(239, 68, 68, 0.42);
+}
+
+.pedal-clutch {
+  height: 82px;
+  border-color: rgba(168, 85, 247, 0.42);
+}
+
+.pedal.pressed {
+  transform: translateY(4px) scale(0.96);
+  background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
+}
+
+.pedal-gas.pressed {
+  border-color: var(--emerald);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+}
+
+.pedal-brake.pressed {
+  border-color: var(--danger);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+}
+
+.pedal-clutch.pressed,
+.pedal-clutch.latched {
+  border-color: #c084fc;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+}
+
+.pedal-title {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.pedal-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* --- RESPONSIVE BREAKPOINTS (MOBILE PORTRAIT & LANDSCAPE) --- */
+@media (max-width: 900px), (pointer: coarse) {
+  .desktop-only {
+    display: none;
+  }
+
+  .wheel-caption {
+    display: none;
+  }
+
+  .steering-wheel-pad {
+    width: 152px;
+    height: 152px;
+  }
+
+  .pedal {
+    width: 60px;
+    height: 92px;
+  }
+
+  .pedal-gas {
+    width: 64px;
+    height: 108px;
+  }
+
+  .gear-btn {
+    min-width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+}
+
+/* Portrait Phones */
+@media (max-width: 680px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .hud-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .mission-panel {
+    max-width: none;
+    padding: 8px 10px;
+  }
+
+  .mission-desc {
+    font-size: 11.5px;
+    margin: 3px 0 6px;
+  }
+
+  .utility-bar {
+    align-self: flex-end;
+  }
+
+  .hud-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "telemetry telemetry"
+      "wheel pedals";
+    align-items: end;
+    gap: 8px;
+  }
+
+  .telemetry-cluster {
+    grid-area: telemetry;
+    width: 100%;
+  }
+
+  .telemetry-main {
+    width: 100%;
+    justify-content: space-between;
+    padding: 6px 10px;
+    gap: 8px;
+  }
+
+  .gauges-box {
+    min-width: 120px;
+    flex: 1;
+  }
+
+  .speed-val {
+    font-size: 24px;
+  }
+
+  .gear-strip {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .gear-btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .wheel-zone {
+    grid-area: wheel;
+    align-items: flex-start;
+  }
+
+  .steering-wheel-pad {
+    width: 136px;
+    height: 136px;
+  }
+
+  .pedals-cluster {
+    grid-area: pedals;
+    justify-self: end;
+  }
+
+  .pedal {
+    width: 50px;
+    height: 82px;
+  }
+
+  .pedal-gas {
+    width: 54px;
+    height: 94px;
+  }
+}
+
+/* Compact Landscape Phones (keep center windshield completely unobstructed!) */
+@media (max-height: 520px) {
+  .hud {
+    padding: 6px 10px;
+  }
+
+  .mission-panel {
+    padding: 6px 10px;
+    max-width: 430px;
+  }
+
+  .mission-desc {
+    display: none;
+  }
+
+  .steering-wheel-pad {
+    width: 126px;
+    height: 126px;
+  }
+
+  .telemetry-main {
+    padding: 5px 10px;
+    gap: 8px;
+  }
+
+  .speed-val {
+    font-size: 23px;
+  }
+
+  .gear-box {
+    width: 38px;
+    height: 40px;
+  }
+
+  .gear-val {
+    font-size: 18px;
+  }
+
+  .gauges-box {
+    min-width: 118px;
+  }
+
+  .pedal {
+    width: 50px;
+    height: 72px;
+  }
+
+  .pedal-gas {
+    width: 54px;
+    height: 84px;
+  }
+}

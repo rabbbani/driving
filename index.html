@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>PARKLITE — Lightweight 3D Parking Simulator</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e293b'/%3E%3Crect x='10' y='10' width='44' height='44' rx='9' fill='none' stroke='%2338bdf8' stroke-width='4'/%3E%3Ctext x='32' y='43' font-family='sans-serif' font-size='30' font-weight='bold' text-anchor='middle' fill='%23f8fafc'%3EP%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 3D Viewport -->
+  <div id="canvas-container" aria-label="3D Driving Viewport"></div>
+  <div id="collision-flash" class="collision-flash" aria-hidden="true"></div>
+
+  <!-- MAIN MENU -->
+  <section id="screen-menu" class="overlay-screen active" aria-label="Main Menu">
+    <div class="menu-card">
+      <div class="brand-badge">MANUAL DRIVING &amp; PARKING</div>
+      <h1 class="brand-title">PARK<span>LITE</span></h1>
+      <p class="brand-subtitle">Lightweight 3D manual transmission &amp; precision parking simulator.</p>
+
+      <div class="menu-actions">
+        <button id="btn-menu-play" class="btn btn-primary btn-lg" type="button">Play</button>
+        <button id="btn-menu-missions" class="btn btn-secondary" type="button">Missions</button>
+        <button id="btn-menu-settings" class="btn btn-secondary" type="button">Settings</button>
+        <button id="btn-menu-about" class="btn btn-ghost" type="button">About</button>
+      </div>
+
+      <div class="menu-quick-tip">
+        <span>Quick Start:</span> Hold <kbd>E</kbd> (Clutch) &rarr; Press <kbd>1</kbd> (1st Gear) &rarr; Hold <kbd>W</kbd> while releasing <kbd>E</kbd>
+      </div>
+    </div>
+  </section>
+
+  <!-- IN-GAME HUD -->
+  <div id="hud" class="hud hidden" aria-live="polite">
+    <!-- Top Bar: Mission Objective + Utility Controls -->
+    <header class="hud-top">
+      <div class="mission-panel">
+        <div class="mission-header-row">
+          <span id="hud-mission-tag" class="mission-tag">MISSION 1</span>
+          <span id="hud-mission-title" class="mission-title">Forward Bay Park</span>
+          <span class="mission-stats">
+            <span id="hud-timer" class="stat-pill">0.0s</span>
+            <span id="hud-collisions" class="stat-pill">Hits: 0</span>
+          </span>
+        </div>
+        <p id="hud-mission-desc" class="mission-desc">
+          Hold Clutch [E], select 1st Gear [1], and park inside the highlighted bay.
+        </p>
+
+        <!-- Live Completion & Alignment Progress -->
+        <div class="parking-check-row">
+          <div class="check-badges">
+            <span id="badge-bounds" class="check-badge">BAY</span>
+            <span id="badge-angle" class="check-badge">ALIGN</span>
+            <span id="badge-stop" class="check-badge">STOP</span>
+          </div>
+          <div class="progress-track" title="Parking completion indicator">
+            <div id="hud-progress-fill" class="progress-fill"></div>
+          </div>
+          <span id="hud-park-hint" class="park-hint">Approach target bay</span>
+        </div>
+      </div>
+
+      <div class="utility-bar">
+        <button id="btn-hud-reset" class="hud-btn" type="button" title="Reset Car (T)">
+          <span class="hud-btn-label">Reset</span>
+          <kbd class="desktop-only">T</kbd>
+        </button>
+        <button id="btn-hud-camera" class="hud-btn" type="button" title="Switch Camera (C)">
+          <span id="hud-camera-label" class="hud-btn-label">Cam: Chase</span>
+          <kbd class="desktop-only">C</kbd>
+        </button>
+        <button id="btn-hud-pause" class="hud-btn hud-btn-icon" type="button" title="Pause (Esc)" aria-label="Pause Game">
+          &#10074;&#10074;
+        </button>
+      </div>
+    </header>
+
+    <!-- Center Toast / Transmission Feedback -->
+    <div id="hud-toast" class="hud-toast hidden" role="status"></div>
+
+    <!-- Bottom Driving Controls & Telemetry -->
+    <div class="hud-bottom">
+      <!-- Left: Visible Interactive Steering Wheel -->
+      <div class="wheel-zone">
+        <div id="steering-wheel-pad" class="steering-wheel-pad" title="Drag with mouse or touch to steer">
+          <svg id="steering-wheel-svg" class="steering-wheel-svg" viewBox="0 0 200 200" aria-label="Steering Wheel">
+            <!-- Outer Rim -->
+            <circle cx="100" cy="100" r="84" fill="none" stroke="#0f172a" stroke-width="22" />
+            <circle cx="100" cy="100" r="84" fill="none" stroke="#334155" stroke-width="16" />
+            <circle cx="100" cy="100" r="76" fill="none" stroke="#475569" stroke-width="1.5" />
+            <!-- Top Center Marker Band -->
+            <path d="M 93 16 L 107 16 L 105 32 L 95 32 Z" fill="#38bdf8" />
+            <!-- Three Spokes -->
+            <path d="M 24 92 L 76 92 L 76 110 L 24 106 Z" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
+            <path d="M 176 92 L 124 92 L 124 110 L 176 106 Z" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
+            <path d="M 90 122 L 110 122 L 107 176 L 93 176 Z" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
+            <!-- Center Hub -->
+            <circle cx="100" cy="102" r="28" fill="#0f172a" stroke="#64748b" stroke-width="2.5" />
+            <text x="100" y="107" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="700" font-family="sans-serif">PL</text>
+          </svg>
+        </div>
+        <div class="wheel-caption">Drag or A / D</div>
+      </div>
+
+      <!-- Center: Telemetry (Speedometer, Gear, RPM, Clutch, Stall) + Gear Selector -->
+      <div class="telemetry-cluster">
+        <div class="telemetry-main">
+          <div class="speed-box">
+            <span id="hud-speed" class="speed-val">0</span>
+            <span class="speed-unit">km/h</span>
+          </div>
+
+          <div id="hud-gear-box" class="gear-box" title="Current Gear">
+            <span class="gear-caption">GEAR</span>
+            <span id="hud-gear" class="gear-val">N</span>
+          </div>
+
+          <div class="gauges-box">
+            <div class="gauge-row">
+              <span class="gauge-label">RPM</span>
+              <div class="gauge-bar">
+                <div id="hud-rpm-fill" class="gauge-fill rpm-fill"></div>
+              </div>
+              <span id="hud-rpm-text" class="gauge-num">850</span>
+            </div>
+            <div class="gauge-row">
+              <span class="gauge-label">CLUTCH</span>
+              <div class="gauge-bar">
+                <div id="hud-clutch-fill" class="gauge-fill clutch-fill"></div>
+              </div>
+              <span id="hud-clutch-state" class="gauge-num">ENG</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engine Stall Restart Banner (clickable & keyboard accessible) -->
+        <button id="hud-stall-btn" class="stall-banner hidden" type="button">
+          ENGINE STALLED &mdash; Tap or Press [E]+[W] / [F] to Start
+        </button>
+
+        <!-- Clearly Labeled Gear-Selection Buttons (works on both Mobile & Desktop) -->
+        <div class="gear-strip" role="group" aria-label="Gear Selection">
+          <button class="gear-btn" data-gear="P" type="button">P</button>
+          <button class="gear-btn" data-gear="R" type="button">R</button>
+          <button class="gear-btn active" data-gear="N" type="button">N</button>
+          <button class="gear-btn" data-gear="1" type="button">1</button>
+          <button class="gear-btn" data-gear="2" type="button">2</button>
+          <button class="gear-btn" data-gear="3" type="button">3</button>
+          <button class="gear-btn" data-gear="4" type="button">4</button>
+        </div>
+      </div>
+
+      <!-- Right: Pedals & Handbrake (Clutch, Brake, Gas, P-Brake) -->
+      <div id="pedals-cluster" class="pedals-cluster">
+        <button id="btn-handbrake" class="handbrake-btn" type="button" title="Handbrake (Space)">
+          P-BRAKE
+        </button>
+        <div class="pedals-row">
+          <button id="pedal-clutch" class="pedal pedal-clutch" type="button" title="Clutch Pedal (E)">
+            <span class="pedal-title">CLUTCH</span>
+            <span class="pedal-sub">E</span>
+          </button>
+          <button id="pedal-brake" class="pedal pedal-brake" type="button" title="Brake Pedal (S)">
+            <span class="pedal-title">BRAKE</span>
+            <span class="pedal-sub">S</span>
+          </button>
+          <button id="pedal-gas" class="pedal pedal-gas" type="button" title="Accelerator Pedal (W)">
+            <span class="pedal-title">GAS</span>
+            <span class="pedal-sub">W</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSIONS MODAL -->
+  <section id="modal-missions" class="overlay-screen" aria-label="Select Mission">
+    <div class="modal-card modal-wide">
+      <div class="modal-header">
+        <h2>Parking Missions</h2>
+        <button data-close-modal="modal-missions" class="btn-close" type="button" aria-label="Close">&times;</button>
+      </div>
+      <p class="modal-lead">Complete the three core parking tests or take on the precision bonus challenges.</p>
+      <div id="missions-grid" class="missions-grid"></div>
+      <div class="modal-footer">
+        <button data-close-modal="modal-missions" class="btn btn-secondary" type="button">Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS MODAL -->
+  <section id="modal-settings" class="overlay-screen" aria-label="Settings">
+    <div class="modal-card modal-wide">
+      <div class="modal-header">
+        <h2>Settings &amp; Controls</h2>
+        <button data-close-modal="modal-settings" class="btn-close" type="button" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="settings-layout">
+        <div class="settings-controls-col">
+          <div class="setting-group">
+            <label class="setting-label">Graphics Quality</label>
+            <div class="segmented-control" role="radiogroup" aria-label="Graphics Quality">
+              <button class="seg-btn" data-quality="low" type="button">Low</button>
+              <button class="seg-btn active" data-quality="medium" type="button">Medium</button>
+              <button class="seg-btn" data-quality="high" type="button">High</button>
+            </div>
+            <label class="checkbox-row">
+              <input id="chk-auto-quality" type="checkbox" checked />
+              <span>Automatically reduce quality if FPS drops</span>
+            </label>
+          </div>
+
+          <div class="setting-group">
+            <div class="setting-label-row">
+              <label for="slider-volume" class="setting-label">Sound Volume</label>
+              <span id="val-volume" class="setting-val">55%</span>
+            </div>
+            <input id="slider-volume" type="range" min="0" max="100" value="55" />
+          </div>
+
+          <div class="setting-group">
+            <div class="setting-label-row">
+              <label for="slider-mouse-sens" class="setting-label">Mouse Wheel Sensitivity</label>
+              <span id="val-mouse-sens" class="setting-val">1.0x</span>
+            </div>
+            <input id="slider-mouse-sens" type="range" min="40" max="200" value="100" />
+          </div>
+
+          <div class="setting-group">
+            <div class="setting-label-row">
+              <label for="slider-steer-sens" class="setting-label">Steering Sensitivity</label>
+              <span id="val-steer-sens" class="setting-val">1.0x</span>
+            </div>
+            <input id="slider-steer-sens" type="range" min="50" max="180" value="100" />
+          </div>
+
+          <div class="setting-group">
+            <label class="setting-label">On-Screen Pedals</label>
+            <div class="segmented-control" role="radiogroup" aria-label="On-Screen Pedals">
+              <button class="seg-btn active" data-pedals="auto" type="button">Auto</button>
+              <button class="seg-btn" data-pedals="show" type="button">Always Show</button>
+              <button class="seg-btn" data-pedals="hide" type="button">Desktop Compact</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="instructions-col">
+          <h3>Control Instructions</h3>
+          <ul class="controls-list">
+            <li><span>Accelerate / Brake</span> <span><kbd>W</kbd> <kbd>S</kbd> or <kbd>&uarr;</kbd> <kbd>&darr;</kbd></span></li>
+            <li><span>Steer Left / Right</span> <span>Drag Wheel, <kbd>A</kbd> <kbd>D</kbd>, <kbd>&larr;</kbd> <kbd>&rarr;</kbd></span></li>
+            <li><span>Clutch (Hold or Tap)</span> <span><kbd>E</kbd> (or <kbd>Shift</kbd>)</span></li>
+            <li><span>Forward Gears</span> <span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></span></li>
+            <li><span>Park / Reverse / Neutral</span> <span><kbd>P</kbd> <kbd>R</kbd> <kbd>N</kbd> (or <kbd>7</kbd> <kbd>6</kbd> <kbd>0</kbd>)</span></li>
+            <li><span>Handbrake</span> <span><kbd>Space</kbd></span></li>
+            <li><span>Change Camera</span> <span><kbd>C</kbd></span></li>
+            <li><span>Reset Car / Restart Engine</span> <span><kbd>T</kbd> / <kbd>F</kbd></span></li>
+          </ul>
+          <p class="controls-note">
+            <strong>Mobile:</strong> Rotate the virtual wheel with one thumb, tap/hold Clutch to select a gear, then press Gas smoothly.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button data-close-modal="modal-settings" class="btn btn-primary" type="button">Done</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT MODAL -->
+  <section id="modal-about" class="overlay-screen" aria-label="About PARKLITE">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>About PARKLITE</h2>
+        <button data-close-modal="modal-about" class="btn-close" type="button" aria-label="Close">&times;</button>
+      </div>
+      <div class="about-body">
+        <p>
+          <strong>PARKLITE</strong> is a lightweight 3D manual driving and parking simulator designed for instant loading, responsive handling, and smooth 60 FPS performance across desktop and mobile browsers.
+        </p>
+        <h3>Manual Driving Tips</h3>
+        <ul>
+          <li><strong>Starting smoothly:</strong> Hold Clutch (<kbd>E</kbd>), select <strong>1st Gear</strong> (or <strong>R</strong>), apply gentle Gas (<kbd>W</kbd>), and release the clutch smoothly.</li>
+          <li><strong>Avoiding stalls:</strong> Releasing the clutch at near-zero speed in a tall gear (2nd–4th), while holding the brake, or with zero throttle will bog down RPM and stall the engine.</li>
+          <li><strong>Clean parking:</strong> Pull fully inside the painted lines, match the yellow ground arrow within ~12&deg;, and come to a full stop.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button data-close-modal="modal-about" class="btn btn-primary" type="button">Close</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAUSE MODAL -->
+  <section id="modal-pause" class="overlay-screen" aria-label="Game Paused">
+    <div class="modal-card modal-narrow">
+      <h2>Paused</h2>
+      <div class="menu-actions">
+        <button id="btn-pause-resume" class="btn btn-primary" type="button">Resume</button>
+        <button id="btn-pause-restart" class="btn btn-secondary" type="button">Restart Mission</button>
+        <button id="btn-pause-missions" class="btn btn-secondary" type="button">Missions</button>
+        <button id="btn-pause-settings" class="btn btn-secondary" type="button">Settings</button>
+        <button id="btn-pause-menu" class="btn btn-ghost" type="button">Main Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION COMPLETE / RESULT MODAL -->
+  <section id="modal-result" class="overlay-screen" aria-label="Mission Result">
+    <div class="modal-card modal-narrow">
+      <div id="result-badge" class="result-badge">MISSION COMPLETE</div>
+      <h2 id="result-title">Parked Cleanly!</h2>
+      <div id="result-stars" class="result-stars" aria-label="Star Rating">&#9733;&#9733;&#9733;</div>
+
+      <div id="result-breakdown" class="score-breakdown">
+        <div class="score-row">
+          <span>Alignment &amp; Centering</span>
+          <strong id="score-accuracy">96% (+480)</strong>
+        </div>
+        <div class="score-row">
+          <span>Completion Time</span>
+          <strong id="score-time">18.4s (+300)</strong>
+        </div>
+        <div class="score-row">
+          <span>Clean Driving Bonus</span>
+          <strong id="score-collisions">0 hits (+200)</strong>
+        </div>
+        <div class="score-row score-total">
+          <span>Total Score</span>
+          <strong id="score-total">980</strong>
+        </div>
+      </div>
+
+      <p id="result-fail-msg" class="result-fail-msg hidden"></p>
+
+      <div class="menu-actions">
+        <button id="btn-result-next" class="btn btn-primary" type="button">Next Mission</button>
+        <button id="btn-result-retry" class="btn btn-secondary" type="button">Retry Mission</button>
+        <button id="btn-result-menu" class="btn btn-ghost" type="button">Main Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
